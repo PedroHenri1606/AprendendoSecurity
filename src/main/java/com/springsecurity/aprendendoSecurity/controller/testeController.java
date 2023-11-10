@@ -1,22 +1,38 @@
 package com.springsecurity.aprendendoSecurity.controller;
 
+import com.springsecurity.aprendendoSecurity.entity.UserEntity;
+import com.springsecurity.aprendendoSecurity.service.UserService;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequestMapping("/")
 public class testeController {
 
-    @GetMapping(value = "/userAuth")
-    @PreAuthorize("hasRole('USER')")
+    @Autowired
+    private UserService service;
+
+    @GetMapping(value = "/cadastrar")
+    @PreAuthorize("hasRole('ADMIN')")
     public String teste(){
-        return "<h1> Teste </h1>";
+        return "<h1> cadastrar </h1>";
     }
 
     @GetMapping(value = "/livre")
+    @PreAuthorize("hasRole('USER')")
     public String testeLivre(){
         return "<h1> Você acessou! </h1>";
+    }
+
+    @PostMapping(value = "/cadastrar")
+    public ResponseEntity<UserEntity> cadastrar(@RequestBody final UserEntity user){
+        try {
+            return ResponseEntity.status(HttpStatus.CREATED).body(service.cadastrar(user));
+        } catch (Exception e){
+            throw new RuntimeException(HttpStatus.BAD_REQUEST + e.getMessage());
+        }
     }
 }
